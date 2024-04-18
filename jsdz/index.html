@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Погода</title>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        background-color: #f5f5f5;
+        margin: 0;
+    }
+    .container {
+        text-align: center;
+    }
+    input[type="text"] {
+        padding: 8px;
+        margin-right: 8px;
+    }
+    button {
+        padding: 8px 16px;
+        cursor: pointer;
+    }
+    .weather-info {
+        margin-top: 20px;
+    }
+</style>
+</head>
+<body>
+<div class="container">
+    <input type="text" id="cityInput" placeholder="Введите название города">
+    <button onclick="getWeather()">Узнать погоду</button>
+    <div class="weather-info" id="weatherInfo"></div>
+</div>
+<script>
+class WeatherApp {
+    constructor(apiKey) {
+        this.apiKey = apiKey;
+    }
+
+    async getWeather(city) {
+        const url = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${this.apiKey}&units=metric`;
+        const response = await fetch(url);
+        const data = await response.json();
+        return data;
+    }
+
+    displayWeather(city) {
+        this.getWeather(city)
+            .then(data => {
+                const weatherInfo = document.getElementById('weatherInfo');
+                weatherInfo.innerHTML = `
+                    <h2>Погода в ${city}</h2>
+                    <p>Тип погоды: ${data.weather[0].description}</p>
+                    <p>Температура: ${data.main.temp} °C</p>
+                    <p>Ощущается как: ${data.main.feels_like} °C</p>
+                    <p>Давление: ${data.main.pressure} hPa</p>
+                    <p>Скорость ветра: ${data.wind.speed} м/c</p>
+                `;
+            })
+            .catch(error => console.error('Ошибка при получении данных:', error));
+    }
+}
+
+const apiKey = '1d04588066a0d9141b0f6ea3ad477dff';
+const weatherApp = new WeatherApp(apiKey);
+
+function getWeather() {
+    const cityInput = document.getElementById('cityInput').value.trim();
+    if (cityInput !== '') {
+        weatherApp.displayWeather(cityInput);
+    } else {
+        alert('Введите название города!');
+    }
+}
+</script>
+</body>
+</html>
